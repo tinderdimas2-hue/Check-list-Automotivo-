@@ -3,44 +3,71 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-    <title>Checklist Auto - Oficina Móvel</title>
+    <title>Checklist Auto - Profissional</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             background: #eef2f5;
             font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
             padding: 16px 12px 40px;
         }
-
         .container {
             max-width: 700px;
             margin: 0 auto;
         }
-
-        /* cabeçalho e dados do veículo */
+        /* cabeçalho principal com logo e empresa */
         .header {
             background: #0b5e7e;
-            color: white;
             border-radius: 24px;
             padding: 20px 18px;
             margin-bottom: 24px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            color: white;
         }
-        .header h1 {
-            font-size: 1.7rem;
+        .empresa-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 16px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
         }
-        .header p {
-            font-size: 0.8rem;
-            opacity: 0.9;
+        .logo-area {
+            background: white;
+            border-radius: 16px;
+            padding: 8px;
+            width: 70px;
+            height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .logo-area img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+        .logo-placeholder {
+            font-size: 32px;
+        }
+        .empresa-nome {
+            flex: 1;
+        }
+        .empresa-nome input {
+            width: 100%;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 40px;
+            padding: 10px 16px;
+            font-weight: bold;
+            font-size: 1rem;
+            text-transform: uppercase;
         }
         .vehicle-card {
             background: white;
@@ -53,7 +80,7 @@
             color: #1e2a3a;
         }
         .vehicle-field {
-            flex: 1 1 160px;
+            flex: 1 1 140px;
             display: flex;
             flex-direction: column;
             gap: 4px;
@@ -64,15 +91,15 @@
             color: #0b5e7e;
             text-transform: uppercase;
         }
-        .vehicle-field input {
+        .vehicle-field input, .vehicle-field select {
             border: 1px solid #cbd5e1;
             border-radius: 14px;
             padding: 8px 12px;
             font-size: 0.85rem;
             background: #fefefe;
+            text-transform: uppercase;
         }
-
-        /* fase */
+        /* Fases e cards (igual ao anterior, mas com texto em maiúsculas) */
         .phase {
             margin-bottom: 32px;
             background: white;
@@ -86,18 +113,12 @@
             padding: 14px 20px;
             font-weight: bold;
             font-size: 1.2rem;
-            letter-spacing: -0.3px;
+            text-transform: uppercase;
         }
-
-        /* cards dos itens */
         .item-card {
             background: white;
             border-bottom: 1px solid #e9ecef;
             padding: 16px 18px;
-            transition: 0.1s;
-        }
-        .item-card:last-child {
-            border-bottom: none;
         }
         .item-header {
             display: flex;
@@ -120,9 +141,8 @@
             font-size: 0.95rem;
             color: #1e2a3a;
             flex: 1;
+            text-transform: uppercase;
         }
-
-        /* botões de status (três) */
         .status-buttons {
             display: flex;
             gap: 18px;
@@ -140,20 +160,13 @@
             align-items: center;
             gap: 8px;
             cursor: pointer;
-            transition: 0.1s linear;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             width: auto;
             min-width: 100px;
             justify-content: center;
         }
-        .status-btn span:first-child {
-            font-size: 1.4rem;
-        }
         .status-btn.urgente { background: #ffe6e5; color: #b91c1c; }
         .status-btn.atencao { background: #fff0db; color: #c2410c; }
         .status-btn.ok { background: #e3f7e8; color: #2b6e3c; }
-
-        /* status selecionado (único visível) */
         .selected-status {
             display: flex;
             justify-content: center;
@@ -168,16 +181,12 @@
             display: inline-flex;
             align-items: center;
             gap: 10px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         .selected-badge.urgente { background: #fee2e2; color: #b91c1c; }
         .selected-badge.atencao { background: #fff0db; color: #c2410c; }
         .selected-badge.ok { background: #e0f2e5; color: #2b6e3c; }
-
-        /* campo de observação (só urgente/atenção) */
         .obs-area {
             margin-top: 12px;
-            animation: fadeIn 0.2s;
         }
         .obs-area textarea {
             width: 100%;
@@ -188,14 +197,8 @@
             font-family: inherit;
             background: #fefce8;
             resize: vertical;
+            text-transform: uppercase;
         }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-5px);}
-            to { opacity: 1; transform: translateY(0);}
-        }
-
-        /* botões globais */
         .action-bar {
             display: flex;
             flex-wrap: wrap;
@@ -210,12 +213,9 @@
             border-radius: 60px;
             font-size: 0.9rem;
             cursor: pointer;
-            background: #2c3e50;
             color: white;
             flex: 1 0 auto;
             min-width: 130px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            transition: 0.1s;
         }
         .btn-wpp { background: #25D366; }
         .btn-pdf { background: #c0392b; }
@@ -227,104 +227,163 @@
             color: #5a6874;
             margin-top: 25px;
         }
+        /* máscara da placa */
+        .placa-mascara {
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
 <div class="container" id="app">
     <div class="header">
-        <h1>🔧 Checklist Auto</h1>
-        <p>Inspeção profissional · prioridade por cores</p>
+        <div class="empresa-row">
+            <div class="logo-area" id="logoArea" title="Clique para adicionar logo">
+                <img id="logoImg" src="" alt="Logo" style="display:none;">
+                <span id="logoPlaceholder" class="logo-placeholder">📷</span>
+            </div>
+            <div class="empresa-nome">
+                <input type="text" id="nomeEmpresa" placeholder="NOME DA OFICINA" style="text-transform: uppercase;">
+            </div>
+        </div>
         <div class="vehicle-card">
-            <div class="vehicle-field"><label>📅 Data</label><input type="date" id="dataInspecao"></div>
-            <div class="vehicle-field"><label>🚘 Cliente / Veículo</label><input type="text" id="clienteVeiculo" placeholder="Ex: João - Onix"></div>
-            <div class="vehicle-field"><label>🔢 KM</label><input type="text" id="kmAtual" placeholder="km"></div>
-            <div class="vehicle-field"><label>🔧 Mecânico</label><input type="text" id="mecanico" placeholder="Nome"></div>
+            <div class="vehicle-field"><label>📅 DATA</label><input type="date" id="dataInspecao"></div>
+            <div class="vehicle-field"><label>🚘 CLIENTE</label><input type="text" id="clienteVeiculo" placeholder="NOME" style="text-transform: uppercase;"></div>
+            <div class="vehicle-field"><label>🔢 KM</label><input type="text" id="kmAtual" placeholder="KM" style="text-transform: uppercase;"></div>
+            <div class="vehicle-field"><label>🔧 MECÂNICO</label><input type="text" id="mecanico" placeholder="NOME" style="text-transform: uppercase;"></div>
+            <div class="vehicle-field"><label>🚗 MARCA</label><input type="text" id="marca" placeholder="EX: FIAT" style="text-transform: uppercase;"></div>
+            <div class="vehicle-field"><label>📟 MODELO</label><input type="text" id="modelo" placeholder="EX: PALIO" style="text-transform: uppercase;"></div>
+            <div class="vehicle-field"><label>🔖 PLACA</label><input type="text" id="placa" placeholder="ABC-1234" class="placa-mascara" maxlength="8" style="text-transform: uppercase;"></div>
         </div>
     </div>
 
     <div id="fasesDinamicas"></div>
 
     <div class="action-bar">
-        <button class="btn btn-wpp" id="copiarWPP">📋 Copiar WhatsApp</button>
-        <button class="btn btn-pdf-order" id="printPDFOrdenado">📊 PDF prioritário</button>
-        <button class="btn btn-pdf" id="printPDF">🖨️ Imprimir (original)</button>
-        <button class="btn btn-reset" id="resetStatus">🔄 Resetar tudo</button>
+        <button class="btn btn-wpp" id="copiarWPP">📋 COPIAR WHATSAPP</button>
+        <button class="btn btn-pdf-order" id="printPDFOrdenado">📊 PDF PRIORITÁRIO</button>
+        <button class="btn btn-pdf" id="printPDF">🖨️ IMPRIMIR (ORIGINAL)</button>
+        <button class="btn btn-reset" id="resetStatus">🔄 RESETAR TUDO</button>
     </div>
     <div class="footer-note">
         ✅ Toque em 🔴 URGENTE / 🟡 ATENÇÃO / 🟢 OK – os outros somem.<br>
-        ✅ Se for URGENTE ou ATENÇÃO, descreva o problema abaixo.
+        ✅ Se for URGENTE ou ATENÇÃO, descreva o problema.<br>
+        ✅ Tudo em maiúsculas. Logo e nome da empresa são salvos automaticamente.
     </div>
 </div>
 
 <script>
     // --------------------------------------------------------------
-    // BASE DE 71 ITENS (MESMA LISTA)
+    // BASE DE 71 ITENS (descrições em maiúsculas já no array)
     // --------------------------------------------------------------
     const fases = [
-        { nome: "🚗 Fase 0: Recepção", itens: [
-            "Nível de combustível (registrar exato)",
-            "Quilometragem atual (conferir odômetro)",
-            "Avarias estéticas pré-existentes (riscos, mossas, vidros)",
-            "Objetos de valor no interior",
-            "Acessórios presentes (rádio, calotas, tapetes)"
+        { nome: "🚗 FASE 0: RECEPÇÃO", itens: [
+            "NÍVEL DE COMBUSTÍVEL (REGISTRAR EXATO)",
+            "QUILOMETRAGEM ATUAL (CONFERIR ODÔMETRO)",
+            "AVARIAS ESTÉTICAS PRÉ-EXISTENTES (RISCOS, MOSSAS, VIDROS)",
+            "OBJETOS DE VALOR NO INTERIOR",
+            "ACESSÓRIOS PRESENTES (RÁDIO, CALOTAS, TAPETES)"
         ] },
-        { nome: "🔍 Fase 1: Externa e Carroceria", itens: [
-            "Lataria e pintura (amassados, corrosão)", "Faróis principais (alto/baixo)", "Lanternas traseiras e freio",
-            "Luzes de seta", "Luz de ré", "Luzes de placa", "Para-brisas e vidros (trincas)",
-            "Palhetas do limpador", "Retrovisores externos", "Alinhamento de capô/portas/porta-malas"
+        { nome: "🔍 FASE 1: EXTERNA E CARROCERIA", itens: [
+            "LATARIA E PINTURA (AMASSADOS, CORROSÃO)", "FARÓIS PRINCIPAIS (ALTO/BAIXO)", "LANTERNAS TRASEIRAS E FREIO",
+            "LUZES DE SETA", "LUZ DE RÉ", "LUZES DE PLACA", "PARA-BRISAS E VIDROS (TRINCAS)",
+            "PALHETAS DO LIMPADOR", "RETROVISORES EXTERNOS", "ALINHAMENTO DE CAPÔ/PORTAS/PORTA-MALAS"
         ] },
-        { nome: "🪑 Fase 2: Interna e Painel", itens: [
-            "Advertências do painel (injeção, ABS, airbag)", "Instrumentos (velocímetro, combustível)", "Iluminação interna",
-            "Buzina", "Ar-condicionado e ventilação", "Vidros elétricos e travas", "Ajustes dos bancos",
-            "Cintos de segurança", "Volante e comandos", "Pedais (borrachas e curso)", "Freio de estacionamento",
-            "Retrovisor interno"
+        { nome: "🪑 FASE 2: INTERNA E PAINEL", itens: [
+            "ADVERTÊNCIAS DO PAINEL (INJEÇÃO, ABS, AIRBAG)", "INSTRUMENTOS (VELOCÍMETRO, COMBUSTÍVEL)", "ILUMINAÇÃO INTERNA",
+            "BUZINA", "AR-CONDICIONADO E VENTILAÇÃO", "VIDROS ELÉTRICOS E TRAVAS", "AJUSTES DOS BANCOS",
+            "CINTOS DE SEGURANÇA", "VOLANTE E COMANDOS", "PEDAIS (BORRACHAS E CURSO)", "FREIO DE ESTACIONAMENTO",
+            "RETROVISOR INTERNO"
         ] },
-        { nome: "📦 Fase 3: Porta-Malas", itens: [
-            "Pneu estepe (calibragem, estado)", "Macaco e manivela", "Chave de roda", "Triângulo", "Amortecedores da tampa",
-            "Iluminação do porta-malas", "Assoalho e infiltrações"
+        { nome: "📦 FASE 3: PORTA-MALAS", itens: [
+            "PNEU ESTEPE (CALIBRAGEM, ESTADO)", "MACACO E MANIVELA", "CHAVE DE RODA", "TRIÂNGULO", "AMORTECEDORES DA TAMPA",
+            "ILUMINAÇÃO DO PORTA-MALAS", "ASSOALHO E INFILTRAÇÕES"
         ] },
-        { nome: "🔧 Fase 4: Elevador (cintura)", itens: [
-            "Estado dos pneus (desgaste, bolhas)", "Rodas (trincas, parafusos)", "Pastilhas e discos de freio",
-            "Folga nos rolamentos", "Componentes de direção externos", "Dobradiças e limitadores", "Bocal combustível"
+        { nome: "🔧 FASE 4: ELEVADOR (CINTURA)", itens: [
+            "ESTADO DOS PNEUS (DESGASTE, BOLHAS)", "RODAS (TRINCAS, PARAFUSOS)", "PASTILHAS E DISCOS DE FREIO",
+            "FOLGA NOS ROLAMENTOS", "COMPONENTES DE DIREÇÃO EXTERNOS", "DOBRADIÇAS E LIMITADORES", "BOCAL COMBUSTÍVEL"
         ] },
-        { nome: "🔩 Fase 5: Underbody (total suspenso)", itens: [
-            "Vazamentos no motor", "Vazamentos na transmissão", "Escapamento (corrosão, coxins)", "Amortecedores e molas",
-            "Buchas e bandejas", "Coifas homocinéticas", "Tubulações de freio", "Linhas de combustível",
-            "Protetor de cárter", "Assoalho e chassi", "Caixa de direção"
+        { nome: "🔩 FASE 5: UNDERBODY (TOTAL SUSPENSO)", itens: [
+            "VAZAMENTOS NO MOTOR", "VAZAMENTOS NA TRANSMISSÃO", "ESCAPAMENTO (CORROSÃO, COXINS)", "AMORTECEDORES E MOLAS",
+            "BUCHAS E BANDEJAS", "COIFAS HOMOCINÉTICAS", "TUBULAÇÕES DE FREIO", "LINHAS DE COMBUSTÍVEL",
+            "PROTETOR DE CÁRTER", "ASSOALHO E CHASSI", "CAIXA DE DIREÇÃO"
         ] },
-        { nome: "🔌 Fase 6: Cofre do Motor", itens: [
-            "Nível/estado do óleo", "Líquido de arrefecimento", "Fluido de freio", "Fluido direção hidráulica",
-            "Água do lavador", "Bateria (fixação, terminais)", "Correia de acessórios", "Filtro de ar",
-            "Filtro de cabine", "Cabos e velas (ignição)"
+        { nome: "🔌 FASE 6: COFRE DO MOTOR", itens: [
+            "NÍVEL/ESTADO DO ÓLEO", "LÍQUIDO DE ARREFECIMENTO", "FLUIDO DE FREIO", "FLUIDO DIREÇÃO HIDRÁULICA",
+            "ÁGUA DO LAVADOR", "BATERIA (FIXAÇÃO, TERMINAIS)", "CORREIA DE ACESSÓRIOS", "FILTRO DE AR",
+            "FILTRO DE CABINE", "CABOS E VELAS (IGNIÇÃO)"
         ] },
-        { nome: "📡 Fase 7: Diagnóstico (Scanner)", itens: [
-            "Varredura OBD-II (códigos ocultos)", "Parâmetros em tempo real (sonda lambda)"
+        { nome: "📡 FASE 7: DIAGNÓSTICO (SCANNER)", itens: [
+            "VARREDURA OBD-II (CÓDIGOS OCULTOS)", "PARÂMETROS EM TEMPO REAL (SONDA LAMBDA)"
         ] },
-        { nome: "🏁 Fase 8: Teste de Rodagem", itens: [
-            "Embreagem/câmbio (patinação, trancos)", "Alinhamento (puxa para lado)", "Frenagem (vibrações, ruídos)",
-            "Ruídos de suspensão", "Desempenho do motor (engasgos)"
+        { nome: "🏁 FASE 8: TESTE DE RODAGEM", itens: [
+            "EMBREAGEM/CÂMBIO (PATINAÇÃO, TRANCOS)", "ALINHAMENTO (PUXA PARA LADO)", "FRENAGEM (VIBRAÇÕES, RUÍDOS)",
+            "RUÍDOS DE SUSPENSÃO", "DESEMPENHO DO MOTOR (ENGASGOS)"
         ] },
-        { nome: "📄 Fase 9: Documentação", itens: [
-            "Recalls pendentes", "Gravação do chassi nos vidros"
+        { nome: "📄 FASE 9: DOCUMENTAÇÃO", itens: [
+            "RECALLS PENDENTES", "GRAVAÇÃO DO CHASSI NOS VIDROS"
         ] }
     ];
 
-    // Montar array linear com descrições (índice 1 a 71)
+    // Montar array linear com descrições (71 itens)
     let descricoesGlobais = [];
     for (let fase of fases) {
         for (let desc of fase.itens) {
             descricoesGlobais.push(desc);
         }
     }
-    if(descricoesGlobais.length !== 71) console.warn("total itens:", descricoesGlobais.length);
 
-    // Helper salvar/recuperar status e obs
+    // Helpers localStorage
     function getStatus(num) { return localStorage.getItem(`status_${num}`); }
     function setStatus(num, val) { localStorage.setItem(`status_${num}`, val); }
     function getObs(num) { return localStorage.getItem(`obs_${num}`) || ''; }
     function setObs(num, val) { localStorage.setItem(`obs_${num}`, val); }
 
-    // Renderização dinâmica (cards mobile)
+    // Máscara para placa (ABC-1234)
+    function aplicarMascaraPlaca(input) {
+        let valor = input.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+        if (valor.length > 3) {
+            valor = valor.slice(0,3) + '-' + valor.slice(3,7);
+        }
+        input.value = valor.slice(0,8);
+    }
+
+    // Persistência da logo (base64)
+    function salvarLogo(base64) {
+        localStorage.setItem('logo_oficina', base64);
+    }
+    function carregarLogo() {
+        const logoBase64 = localStorage.getItem('logo_oficina');
+        const img = document.getElementById('logoImg');
+        const placeholder = document.getElementById('logoPlaceholder');
+        if (logoBase64 && logoBase64 !== '') {
+            img.src = logoBase64;
+            img.style.display = 'block';
+            placeholder.style.display = 'none';
+        } else {
+            img.style.display = 'none';
+            placeholder.style.display = 'flex';
+        }
+    }
+    function abrirSeletorLogo() {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'image/*';
+        input.onchange = (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (ev) => {
+                    const base64 = ev.target.result;
+                    salvarLogo(base64);
+                    carregarLogo();
+                };
+                reader.readAsDataURL(file);
+            }
+        };
+        input.click();
+    }
+
+    // Renderização dos cards (mantendo lógica de exclusividade e campo de observação)
     function renderizarChecklist() {
         const container = document.getElementById('fasesDinamicas');
         container.innerHTML = '';
@@ -353,12 +412,10 @@
                 headerDiv.innerHTML = `<span class="item-num">#${num}</span><span class="item-desc">${desc}</span>`;
                 card.appendChild(headerDiv);
 
-                // área de status (inicialmente os três botões, se não houver status salvo)
                 const statusContainer = document.createElement('div');
                 statusContainer.id = `status-area-${num}`;
 
                 if (!savedStatus) {
-                    // três botões
                     const btnsDiv = document.createElement('div');
                     btnsDiv.className = 'status-buttons';
                     btnsDiv.innerHTML = `
@@ -368,7 +425,6 @@
                     `;
                     statusContainer.appendChild(btnsDiv);
                 } else {
-                    // botão único com status selecionado
                     let statusText = '', statusClass = '', emoji = '';
                     if(savedStatus === 'urgencia') { statusText = 'URGENTE'; statusClass = 'urgente'; emoji = '🔴'; }
                     else if(savedStatus === 'atencao') { statusText = 'ATENÇÃO'; statusClass = 'atencao'; emoji = '🟡'; }
@@ -378,24 +434,21 @@
                     selectedDiv.innerHTML = `<div class="selected-badge ${statusClass}"><span>${emoji}</span> ${statusText} <span style="margin-left:12px; font-size:0.8rem; cursor:pointer;" class="reset-status-btn" data-num="${num}">✖️</span></div>`;
                     statusContainer.appendChild(selectedDiv);
                 }
-
                 card.appendChild(statusContainer);
 
-                // área de observação (só aparece se for urgente ou atenção E tiver status salvo)
                 const obsDiv = document.createElement('div');
                 obsDiv.className = 'obs-area';
                 obsDiv.id = `obs-area-${num}`;
                 if (savedStatus === 'urgencia' || savedStatus === 'atencao') {
                     const textarea = document.createElement('textarea');
                     textarea.rows = 2;
-                    textarea.placeholder = `Descreva o problema (${savedStatus === 'urgencia' ? 'URGENTE' : 'ATENÇÃO'})...`;
+                    textarea.placeholder = `DESCREVA O PROBLEMA (${savedStatus === 'urgencia' ? 'URGENTE' : 'ATENÇÃO'})...`;
                     textarea.value = savedObs;
+                    textarea.style.textTransform = 'uppercase';
                     textarea.addEventListener('input', (e) => {
-                        setObs(num, e.target.value);
+                        setObs(num, e.target.value.toUpperCase());
                     });
                     obsDiv.appendChild(textarea);
-                } else if (savedStatus === 'ok') {
-                    // nenhum campo extra
                 }
                 card.appendChild(obsDiv);
                 phaseDiv.appendChild(card);
@@ -403,23 +456,17 @@
             container.appendChild(phaseDiv);
         }
 
-        // adicionar event listeners (delegação)
+        // Eventos dos botões de status
         document.querySelectorAll('.status-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const num = parseInt(btn.dataset.num);
                 const novoStatus = btn.dataset.status;
-                // salvar
                 setStatus(num, novoStatus);
-                // se for ok, remove a obs (limpa)
-                if (novoStatus === 'ok') {
-                    setObs(num, '');
-                }
-                // re-renderizar para mostrar somente o status selecionado e possível campo
+                if (novoStatus === 'ok') setObs(num, '');
                 renderizarChecklist();
             });
         });
-
-        // botões de reset (✖️) para limpar status de um item individual
+        // Botões de reset individual
         document.querySelectorAll('.reset-status-btn').forEach(resetBtn => {
             resetBtn.addEventListener('click', (e) => {
                 const num = parseInt(resetBtn.dataset.num);
@@ -430,19 +477,15 @@
         });
     }
 
-    // --------------------------------------------------------------
-    // LÓGICA DE ORDENAÇÃO E TEXTO PARA WHATSAPP (prioridade)
-    // --------------------------------------------------------------
+    // Ordenação por prioridade (para WhatsApp e PDF)
     function obterTodosItensOrdenados() {
         let itens = [];
         for (let i = 1; i <= 71; i++) {
-            let status = getStatus(i);
-            let obs = getObs(i);
             itens.push({
                 numero: i,
                 descricao: descricoesGlobais[i-1],
-                status: status,
-                obs: obs
+                status: getStatus(i),
+                obs: getObs(i)
             });
         }
         const ordemPrio = { 'urgencia': 1, 'atencao': 2, 'ok': 3 };
@@ -454,21 +497,24 @@
         });
     }
 
+    // Gerar texto para WhatsApp (maiúsculas já garantidas)
     function gerarTextoWhatsApp() {
         const itensOrdenados = obterTodosItensOrdenados();
         const data = document.getElementById('dataInspecao').value || '__/__/____';
-        const cliente = document.getElementById('clienteVeiculo').value || 'Não informado';
+        const cliente = document.getElementById('clienteVeiculo').value.toUpperCase() || 'NÃO INFORMADO';
         const km = document.getElementById('kmAtual').value || '---';
-        const mecanico = document.getElementById('mecanico').value || '---';
-
-        let texto = `*🔧 CHECKLIST AUTO - PRIORIDADE*\n\n`;
-        texto += `*Data:* ${data}\n*Cliente/Veículo:* ${cliente}\n*KM:* ${km}\n*Mecânico:* ${mecanico}\n─────────────────\n\n`;
-
+        const mecanico = document.getElementById('mecanico').value.toUpperCase() || '---';
+        const marca = document.getElementById('marca').value.toUpperCase() || '';
+        const modelo = document.getElementById('modelo').value.toUpperCase() || '';
+        const placa = document.getElementById('placa').value.toUpperCase() || 'SEM PLACA';
+        const nomeEmpresa = document.getElementById('nomeEmpresa').value.toUpperCase() || 'OFICINA';
+        let texto = `*${nomeEmpresa}*\n*🔧 CHECKLIST AUTO - PRIORIDADE*\n\n`;
+        texto += `*DATA:* ${data}\n*CLIENTE:* ${cliente}\n*VEÍCULO:* ${marca} ${modelo}\n*PLACA:* ${placa}\n*KM:* ${km}\n*MECÂNICO:* ${mecanico}\n─────────────────\n\n`;
         const grupos = {
-            urgencia: { titulo: "🔴 *URGENTE* (reparar já)", itens: [] },
-            atencao: { titulo: "🟡 *ATENÇÃO* (planejar revisão)", itens: [] },
-            ok: { titulo: "🟢 *OK* (sem pendência)", itens: [] },
-            null: { titulo: "⚪ *PENDENTE* (não verificado)", itens: [] }
+            urgencia: { titulo: "🔴 *URGENTE* (REPARAR JÁ)", itens: [] },
+            atencao: { titulo: "🟡 *ATENÇÃO* (PLANEJAR REVISÃO)", itens: [] },
+            ok: { titulo: "🟢 *OK* (SEM PENDÊNCIA)", itens: [] },
+            null: { titulo: "⚪ *PENDENTE* (NÃO VERIFICADO)", itens: [] }
         };
         for(let item of itensOrdenados) {
             const chave = item.status || 'null';
@@ -480,42 +526,48 @@
             for(let item of grupo.itens) {
                 let linha = `*${item.numero}.* ${item.descricao}`;
                 if(item.obs && item.obs.trim() && (item.status === 'urgencia' || item.status === 'atencao')) {
-                    linha += `\n   📝 *Problema:* ${item.obs.trim()}`;
+                    linha += `\n   📝 *PROBLEMA:* ${item.obs.trim()}`;
                 }
                 texto += `${linha}\n`;
             }
             texto += `\n`;
         }
-        texto += `─────────────────\n✅ Relatório gerado via sistema checklist.`;
+        texto += `─────────────────\n✅ RELATÓRIO GERADO POR SISTEMA CHECKLIST.`;
         return texto;
     }
 
-    // Função copiar WhatsApp
     async function copiarWpp() {
         const texto = gerarTextoWhatsApp();
         try {
             await navigator.clipboard.writeText(texto);
-            alert("✅ Checklist copiado! Cole no WhatsApp com *negrito* incluso.");
+            alert("✅ CHECKLIST COPIADO! COLE NO WHATSAPP COM *NEGRITO* INCLUSO.");
         } catch(e) {
-            alert("Erro ao copiar, tente manualmente.");
+            alert("ERRO AO COPIAR, TENTE MANUALMENTE.");
         }
     }
 
-    // Gerar PDF ordenado (abre nova janela com layout pronto para impressão)
+    // Gerar PDF ordenado com título personalizado (placa + modelo + cliente)
     function gerarPDFOrdenado() {
         const itensOrdenados = obterTodosItensOrdenados();
         const data = document.getElementById('dataInspecao').value || '__/__/____';
-        const cliente = document.getElementById('clienteVeiculo').value || 'Não informado';
+        const cliente = document.getElementById('clienteVeiculo').value.toUpperCase() || 'NÃO INFORMADO';
         const km = document.getElementById('kmAtual').value || '---';
-        const mecanico = document.getElementById('mecanico').value || '---';
+        const mecanico = document.getElementById('mecanico').value.toUpperCase() || '---';
+        const marca = document.getElementById('marca').value.toUpperCase() || '';
+        const modelo = document.getElementById('modelo').value.toUpperCase() || '';
+        const placa = document.getElementById('placa').value.toUpperCase() || 'SEM PLACA';
+        const nomeEmpresa = document.getElementById('nomeEmpresa').value.toUpperCase() || 'OFICINA';
+        const logoBase64 = localStorage.getItem('logo_oficina') || '';
 
         let html = `
         <!DOCTYPE html>
         <html>
-        <head><meta charset="UTF-8"><title>Checklist Priorizado</title>
+        <head><meta charset="UTF-8"><title>${placa} - ${modelo} - ${cliente}</title>
         <style>
             body { font-family: 'Segoe UI', sans-serif; margin: 20px; }
-            h2 { color: #0b5e7e; }
+            .cabecalho { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; border-bottom: 2px solid #0b5e7e; padding-bottom: 10px; }
+            .logo { max-width: 80px; max-height: 80px; }
+            .info-empresa h2 { margin: 0; color: #0b5e7e; }
             .info { background: #f0f7ff; padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 16px; }
             table { width: 100%; border-collapse: collapse; margin-top: 16px; }
             th, td { border: 1px solid #aaa; padding: 8px; vertical-align: top; text-align: left; }
@@ -527,12 +579,16 @@
         </style>
         </head>
         <body>
-        <h2>📋 CHECKLIST PRIORITÁRIO</h2>
-        <div class="info">
-            <div><strong>Data:</strong> ${data}</div><div><strong>Cliente:</strong> ${cliente}</div>
-            <div><strong>KM:</strong> ${km}</div><div><strong>Mecânico:</strong> ${mecanico}</div>
+        <div class="cabecalho">
+            ${logoBase64 ? `<img src="${logoBase64}" class="logo">` : '<div style="width:80px;">📷</div>'}
+            <div class="info-empresa"><h2>${nomeEmpresa}</h2><p>CHECKLIST PRIORITÁRIO</p></div>
         </div>
-        <table><thead><tr><th>#</th><th>Item</th><th>Status</th><th>Problema descrito</th></tr></thead><tbody>
+        <h3>${placa} - ${marca} ${modelo} - ${cliente}</h3>
+        <div class="info">
+            <div><strong>DATA:</strong> ${data}</div><div><strong>KM:</strong> ${km}</div>
+            <div><strong>MECÂNICO:</strong> ${mecanico}</div>
+        </div>
+        <table><thead><tr><th>#</th><th>ITEM</th><th>STATUS</th><th>PROBLEMA DESCRITO</th></tr></thead><tbody>
         `;
         for(let item of itensOrdenados) {
             let statusLabel = '', rowClass = '';
@@ -541,14 +597,9 @@
             else if(item.status === 'ok') { statusLabel = '🟢 OK'; rowClass = 'ok-row'; }
             else { statusLabel = '⚪ PENDENTE'; rowClass = 'pendente-row'; }
             let problema = (item.status === 'urgencia' || item.status === 'atencao') ? (item.obs || '—') : '—';
-            html += `<tr class="${rowClass}">
-                <td>${item.numero}</td>
-                <td>${item.descricao}</td>
-                <td>${statusLabel}</td>
-                <td>${problema.replace(/\n/g, '<br>')}</td>
-            </tr>`;
+            html += `<tr class="${rowClass}"><td>${item.numero}</td><td>${item.descricao}</td><td>${statusLabel}</td><td>${problema.replace(/\n/g, '<br>')}</td></tr>`;
         }
-        html += `</tbody></table><p style="margin-top:20px; font-size:12px;">Documento gerado por sistema checklist profissional.</p>
+        html += `</tbody></table><p style="margin-top:20px; font-size:12px;">DOCUMENTO GERADO POR SISTEMA CHECKLIST PROFISSIONAL.</p>
         <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script>
         </body></html>`;
         const win = window.open();
@@ -556,8 +607,9 @@
         win.document.close();
     }
 
+    // Reset completo
     function resetAll() {
-        if(confirm("Resetar TODOS os status e observações? Não tem volta.")) {
+        if(confirm("RESETAR TODOS OS STATUS E OBSERVAÇÕES? NÃO TEM VOLTA.")) {
             for(let i=1; i<=71; i++) {
                 localStorage.removeItem(`status_${i}`);
                 localStorage.removeItem(`obs_${i}`);
@@ -566,30 +618,38 @@
         }
     }
 
-    // persistência dos dados do veículo
-    function bindVehicleStorage() {
-        const ids = ['dataInspecao', 'clienteVeiculo', 'kmAtual', 'mecanico'];
+    // Persistência dos campos do veículo e empresa
+    function bindVehicleAndCompanyStorage() {
+        const ids = ['dataInspecao', 'clienteVeiculo', 'kmAtual', 'mecanico', 'marca', 'modelo', 'placa', 'nomeEmpresa'];
         ids.forEach(id => {
             const el = document.getElementById(id);
             const saved = localStorage.getItem(`vehicle_${id}`);
             if(saved) el.value = saved;
             el.addEventListener('change', () => {
-                localStorage.setItem(`vehicle_${id}`, el.value);
+                let val = el.value;
+                if (id !== 'dataInspecao') val = val.toUpperCase();
+                localStorage.setItem(`vehicle_${id}`, val);
+                if (id === 'placa') aplicarMascaraPlaca(el);
             });
+            if (id === 'placa') {
+                el.addEventListener('input', () => aplicarMascaraPlaca(el));
+            }
         });
+        // Carregar logo e nome empresa
+        carregarLogo();
+        const logoArea = document.getElementById('logoArea');
+        logoArea.addEventListener('click', abrirSeletorLogo);
     }
 
     window.onload = () => {
         renderizarChecklist();
-        bindVehicleStorage();
+        bindVehicleAndCompanyStorage();
         document.getElementById('copiarWPP').addEventListener('click', copiarWpp);
         document.getElementById('printPDFOrdenado').addEventListener('click', gerarPDFOrdenado);
         document.getElementById('printPDF').addEventListener('click', () => window.print());
         document.getElementById('resetStatus').addEventListener('click', resetAll);
+        // Forçar maiúsculas nos inputs de texto (já feito pelo evento change)
     };
 </script>
 </body>
 </html>
-
-
-
