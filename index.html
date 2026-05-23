@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
+    <title>Checklist Auto - Oficina Móvel</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #eef2f5;
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            padding: 16px 12px 40px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        /* cabeçalho e dados do veículo */
+        .header {
+            background: #0b5e7e;
+            color: white;
+            border-radius: 24px;
+            padding: 20px 18px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            font-size: 1.7rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .header p {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+        .vehicle-card {
+            background: white;
+            border-radius: 20px;
+            padding: 16px;
+            margin-top: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            color: #1e2a3a;
+        }
+        .vehicle-field {
+            flex: 1 1 160px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .vehicle-field label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            color: #0b5e7e;
+            text-transform: uppercase;
+        }
+        .vehicle-field input {
+            border: 1px solid #cbd5e1;
+            border-radius: 14px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            background: #fefefe;
+        }
+
+        /* fase */
+        .phase {
+            margin-bottom: 32px;
+            background: white;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .phase-title {
+            background: #1e4663;
+            color: white;
+            padding: 14px 20px;
+            font-weight: bold;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
+        }
+
+        /* cards dos itens */
+        .item-card {
+            background: white;
+            border-bottom: 1px solid #e9ecef;
+            padding: 16px 18px;
+            transition: 0.1s;
+        }
+        .item-card:last-child {
+            border-bottom: none;
+        }
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .item-num {
+            background: #eef2fa;
+            border-radius: 30px;
+            padding: 4px 12px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            color: #1e4663;
+        }
+        .item-desc {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: #1e2a3a;
+            flex: 1;
+        }
+
+        /* botões de status (três) */
+        .status-buttons {
+            display: flex;
+            gap: 18px;
+            justify-content: center;
+            margin: 12px 0 8px;
+        }
+        .status-btn {
+            background: #f1f5f9;
+            border: none;
+            border-radius: 60px;
+            padding: 10px 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: 0.1s linear;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            width: auto;
+            min-width: 100px;
+            justify-content: center;
+        }
+        .status-btn span:first-child {
+            font-size: 1.4rem;
+        }
+        .status-btn.urgente { background: #ffe6e5; color: #b91c1c; }
+        .status-btn.atencao { background: #fff0db; color: #c2410c; }
+        .status-btn.ok { background: #e3f7e8; color: #2b6e3c; }
+
+        /* status selecionado (único visível) */
+        .selected-status {
+            display: flex;
+            justify-content: center;
+            margin: 12px 0 8px;
+        }
+        .selected-badge {
+            background: #f1f5f9;
+            padding: 10px 24px;
+            border-radius: 60px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .selected-badge.urgente { background: #fee2e2; color: #b91c1c; }
+        .selected-badge.atencao { background: #fff0db; color: #c2410c; }
+        .selected-badge.ok { background: #e0f2e5; color: #2b6e3c; }
+
+        /* campo de observação (só urgente/atenção) */
+        .obs-area {
+            margin-top: 12px;
+            animation: fadeIn 0.2s;
+        }
+        .obs-area textarea {
+            width: 100%;
+            border: 1px solid #cbd5e1;
+            border-radius: 20px;
+            padding: 12px;
+            font-size: 0.85rem;
+            font-family: inherit;
+            background: #fefce8;
+            resize: vertical;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-5px);}
+            to { opacity: 1; transform: translateY(0);}
+        }
+
+        /* botões globais */
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin: 32px 0 20px;
+        }
+        .btn {
+            border: none;
+            padding: 12px 20px;
+            font-weight: bold;
+            border-radius: 60px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            background: #2c3e50;
+            color: white;
+            flex: 1 0 auto;
+            min-width: 130px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: 0.1s;
+        }
+        .btn-wpp { background: #25D366; }
+        .btn-pdf { background: #c0392b; }
+        .btn-pdf-order { background: #16a085; }
+        .btn-reset { background: #7f8c8d; }
+        .footer-note {
+            text-align: center;
+            font-size: 0.7rem;
+            color: #5a6874;
+            margin-top: 25px;
+        }
+    </style>
+</head>
+<body>
+<div class="container" id="app">
+    <div class="header">
+        <h1>🔧 Checklist Auto</h1>
+        <p>Inspeção profissional · prioridade por cores</p>
+        <div class="vehicle-card">
+            <div class="vehicle-field"><label>📅 Data</label><input type="date" id="dataInspecao"></div>
+            <div class="vehicle-field"><label>🚘 Cliente / Veículo</label><input type="text" id="clienteVeiculo" placeholder="Ex: João - Onix"></div>
+            <div class="vehicle-field"><label>🔢 KM</label><input type="text" id="kmAtual" placeholder="km"></div>
+            <div class="vehicle-field"><label>🔧 Mecânico</label><input type="text" id="mecanico" placeholder="Nome"></div>
+        </div>
+    </div>
+
+    <div id="fasesDinamicas"></div>
+
+    <div class="action-bar">
+        <button class="btn btn-wpp" id="copiarWPP">📋 Copiar WhatsApp</button>
+        <button class="btn btn-pdf-order" id="printPDFOrdenado">📊 PDF prioritário</button>
+        <button class="btn btn-pdf" id="printPDF">🖨️ Imprimir (original)</button>
+        <button class="btn btn-reset" id="resetStatus">🔄 Resetar tudo</button>
+    </div>
+    <div class="footer-note">
+        ✅ Toque em 🔴 URGENTE / 🟡 ATENÇÃO / 🟢 OK – os outros somem.<br>
+        ✅ Se for URGENTE ou ATENÇÃO, descreva o problema abaixo.
+    </div>
+</div>
+
+<script>
+    // --------------------------------------------------------------
+    // BASE DE 71 ITENS (MESMA LISTA)
+    // --------------------------------------------------------------
+    const fases = [
+        { nome: "🚗 Fase 0: Recepção", itens: [
+            "Nível de combustível (registrar exato)",
+            "Quilometragem atual (conferir odômetro)",
+            "Avarias estéticas pré-existentes (riscos, mossas, vidros)",
+            "Objetos de valor no interior",
+            "Acessórios presentes (rádio, calotas, tapetes)"
+        ] },
+        { nome: "🔍 Fase 1: Externa e Carroceria", itens: [
+            "Lataria e pintura (amassados, corrosão)", "Faróis principais (alto/baixo)", "Lanternas traseiras e freio",
+            "Luzes de seta", "Luz de ré", "Luzes de placa", "Para-brisas e vidros (trincas)",
+            "Palhetas do limpador", "Retrovisores externos", "Alinhamento de capô/portas/porta-malas"
+        ] },
+        { nome: "🪑 Fase 2: Interna e Painel", itens: [
+            "Advertências do painel (injeção, ABS, airbag)", "Instrumentos (velocímetro, combustível)", "Iluminação interna",
+            "Buzina", "Ar-condicionado e ventilação", "Vidros elétricos e travas", "Ajustes dos bancos",
+            "Cintos de segurança", "Volante e comandos", "Pedais (borrachas e curso)", "Freio de estacionamento",
+            "Retrovisor interno"
+        ] },
+        { nome: "📦 Fase 3: Porta-Malas", itens: [
+            "Pneu estepe (calibragem, estado)", "Macaco e manivela", "Chave de roda", "Triângulo", "Amortecedores da tampa",
+            "Iluminação do porta-malas", "Assoalho e infiltrações"
+        ] },
+        { nome: "🔧 Fase 4: Elevador (cintura)", itens: [
+            "Estado dos pneus (desgaste, bolhas)", "Rodas (trincas, parafusos)", "Pastilhas e discos de freio",
+            "Folga nos rolamentos", "Componentes de direção externos", "Dobradiças e limitadores", "Bocal combustível"
+        ] },
+        { nome: "🔩 Fase 5: Underbody (total suspenso)", itens: [
+            "Vazamentos no motor", "Vazamentos na transmissão", "Escapamento (corrosão, coxins)", "Amortecedores e molas",
+            "Buchas e bandejas", "Coifas homocinéticas", "Tubulações de freio", "Linhas de combustível",
+            "Protetor de cárter", "Assoalho e chassi", "Caixa de direção"
+        ] },
+        { nome: "🔌 Fase 6: Cofre do Motor", itens: [
+            "Nível/estado do óleo", "Líquido de arrefecimento", "Fluido de freio", "Fluido direção hidráulica",
+            "Água do lavador", "Bateria (fixação, terminais)", "Correia de acessórios", "Filtro de ar",
+            "Filtro de cabine", "Cabos e velas (ignição)"
+        ] },
+        { nome: "📡 Fase 7: Diagnóstico (Scanner)", itens: [
+            "Varredura OBD-II (códigos ocultos)", "Parâmetros em tempo real (sonda lambda)"
+        ] },
+        { nome: "🏁 Fase 8: Teste de Rodagem", itens: [
+            "Embreagem/câmbio (patinação, trancos)", "Alinhamento (puxa para lado)", "Frenagem (vibrações, ruídos)",
+            "Ruídos de suspensão", "Desempenho do motor (engasgos)"
+        ] },
+        { nome: "📄 Fase 9: Documentação", itens: [
+            "Recalls pendentes", "Gravação do chassi nos vidros"
+        ] }
+    ];
+
+    // Montar array linear com descrições (índice 1 a 71)
+    let descricoesGlobais = [];
+    for (let fase of fases) {
+        for (let desc of fase.itens) {
+            descricoesGlobais.push(desc);
+        }
+    }
+    if(descricoesGlobais.length !== 71) console.warn("total itens:", descricoesGlobais.length);
+
+    // Helper salvar/recuperar status e obs
+    function getStatus(num) { return localStorage.getItem(`status_${num}`); }
+    function setStatus(num, val) { localStorage.setItem(`status_${num}`, val); }
+    function getObs(num) { return localStorage.getItem(`obs_${num}`) || ''; }
+    function setObs(num, val) { localStorage.setItem(`obs_${num}`, val); }
+
+    // Renderização dinâmica (cards mobile)
+    function renderizarChecklist() {
+        const container = document.getElementById('fasesDinamicas');
+        container.innerHTML = '';
+        let itemCounter = 1;
+
+        for (let fase of fases) {
+            const phaseDiv = document.createElement('div');
+            phaseDiv.className = 'phase';
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'phase-title';
+            titleDiv.innerText = fase.nome;
+            phaseDiv.appendChild(titleDiv);
+
+            for (let desc of fase.itens) {
+                const num = itemCounter++;
+                const savedStatus = getStatus(num);
+                const savedObs = getObs(num);
+
+                const card = document.createElement('div');
+                card.className = 'item-card';
+                card.dataset.num = num;
+
+                // cabeçalho
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'item-header';
+                headerDiv.innerHTML = `<span class="item-num">#${num}</span><span class="item-desc">${desc}</span>`;
+                card.appendChild(headerDiv);
+
+                // área de status (inicialmente os três botões, se não houver status salvo)
+                const statusContainer = document.createElement('div');
+                statusContainer.id = `status-area-${num}`;
+
+                if (!savedStatus) {
+                    // três botões
+                    const btnsDiv = document.createElement('div');
+                    btnsDiv.className = 'status-buttons';
+                    btnsDiv.innerHTML = `
+                        <button class="status-btn urgente" data-status="urgencia" data-num="${num}"><span>🔴</span> URGENTE</button>
+                        <button class="status-btn atencao" data-status="atencao" data-num="${num}"><span>🟡</span> ATENÇÃO</button>
+                        <button class="status-btn ok" data-status="ok" data-num="${num}"><span>🟢</span> OK</button>
+                    `;
+                    statusContainer.appendChild(btnsDiv);
+                } else {
+                    // botão único com status selecionado
+                    let statusText = '', statusClass = '', emoji = '';
+                    if(savedStatus === 'urgencia') { statusText = 'URGENTE'; statusClass = 'urgente'; emoji = '🔴'; }
+                    else if(savedStatus === 'atencao') { statusText = 'ATENÇÃO'; statusClass = 'atencao'; emoji = '🟡'; }
+                    else { statusText = 'OK'; statusClass = 'ok'; emoji = '🟢'; }
+                    const selectedDiv = document.createElement('div');
+                    selectedDiv.className = 'selected-status';
+                    selectedDiv.innerHTML = `<div class="selected-badge ${statusClass}"><span>${emoji}</span> ${statusText} <span style="margin-left:12px; font-size:0.8rem; cursor:pointer;" class="reset-status-btn" data-num="${num}">✖️</span></div>`;
+                    statusContainer.appendChild(selectedDiv);
+                }
+
+                card.appendChild(statusContainer);
+
+                // área de observação (só aparece se for urgente ou atenção E tiver status salvo)
+                const obsDiv = document.createElement('div');
+                obsDiv.className = 'obs-area';
+                obsDiv.id = `obs-area-${num}`;
+                if (savedStatus === 'urgencia' || savedStatus === 'atencao') {
+                    const textarea = document.createElement('textarea');
+                    textarea.rows = 2;
+                    textarea.placeholder = `Descreva o problema (${savedStatus === 'urgencia' ? 'URGENTE' : 'ATENÇÃO'})...`;
+                    textarea.value = savedObs;
+                    textarea.addEventListener('input', (e) => {
+                        setObs(num, e.target.value);
+                    });
+                    obsDiv.appendChild(textarea);
+                } else if (savedStatus === 'ok') {
+                    // nenhum campo extra
+                }
+                card.appendChild(obsDiv);
+                phaseDiv.appendChild(card);
+            }
+            container.appendChild(phaseDiv);
+        }
+
+        // adicionar event listeners (delegação)
+        document.querySelectorAll('.status-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const num = parseInt(btn.dataset.num);
+                const novoStatus = btn.dataset.status;
+                // salvar
+                setStatus(num, novoStatus);
+                // se for ok, remove a obs (limpa)
+                if (novoStatus === 'ok') {
+                    setObs(num, '');
+                }
+                // re-renderizar para mostrar somente o status selecionado e possível campo
+                renderizarChecklist();
+            });
+        });
+
+        // botões de reset (✖️) para limpar status de um item individual
+        document.querySelectorAll('.reset-status-btn').forEach(resetBtn => {
+            resetBtn.addEventListener('click', (e) => {
+                const num = parseInt(resetBtn.dataset.num);
+                localStorage.removeItem(`status_${num}`);
+                localStorage.removeItem(`obs_${num}`);
+                renderizarChecklist();
+            });
+        });
+    }
+
+    // --------------------------------------------------------------
+    // LÓGICA DE ORDENAÇÃO E TEXTO PARA WHATSAPP (prioridade)
+    // --------------------------------------------------------------
+    function obterTodosItensOrdenados() {
+        let itens = [];
+        for (let i = 1; i <= 71; i++) {
+            let status = getStatus(i);
+            let obs = getObs(i);
+            itens.push({
+                numero: i,
+                descricao: descricoesGlobais[i-1],
+                status: status,
+                obs: obs
+            });
+        }
+        const ordemPrio = { 'urgencia': 1, 'atencao': 2, 'ok': 3 };
+        return itens.sort((a,b) => {
+            let prioA = a.status ? ordemPrio[a.status] : 4;
+            let prioB = b.status ? ordemPrio[b.status] : 4;
+            if(prioA !== prioB) return prioA - prioB;
+            return a.numero - b.numero;
+        });
+    }
+
+    function gerarTextoWhatsApp() {
+        const itensOrdenados = obterTodosItensOrdenados();
+        const data = document.getElementById('dataInspecao').value || '__/__/____';
+        const cliente = document.getElementById('clienteVeiculo').value || 'Não informado';
+        const km = document.getElementById('kmAtual').value || '---';
+        const mecanico = document.getElementById('mecanico').value || '---';
+
+        let texto = `*🔧 CHECKLIST AUTO - PRIORIDADE*\n\n`;
+        texto += `*Data:* ${data}\n*Cliente/Veículo:* ${cliente}\n*KM:* ${km}\n*Mecânico:* ${mecanico}\n─────────────────\n\n`;
+
+        const grupos = {
+            urgencia: { titulo: "🔴 *URGENTE* (reparar já)", itens: [] },
+            atencao: { titulo: "🟡 *ATENÇÃO* (planejar revisão)", itens: [] },
+            ok: { titulo: "🟢 *OK* (sem pendência)", itens: [] },
+            null: { titulo: "⚪ *PENDENTE* (não verificado)", itens: [] }
+        };
+        for(let item of itensOrdenados) {
+            const chave = item.status || 'null';
+            grupos[chave].itens.push(item);
+        }
+        for(let grupo of [grupos.urgencia, grupos.atencao, grupos.ok, grupos.null]) {
+            if(grupo.itens.length === 0) continue;
+            texto += `${grupo.titulo}\n`;
+            for(let item of grupo.itens) {
+                let linha = `*${item.numero}.* ${item.descricao}`;
+                if(item.obs && item.obs.trim() && (item.status === 'urgencia' || item.status === 'atencao')) {
+                    linha += `\n   📝 *Problema:* ${item.obs.trim()}`;
+                }
+                texto += `${linha}\n`;
+            }
+            texto += `\n`;
+        }
+        texto += `─────────────────\n✅ Relatório gerado via sistema checklist.`;
+        return texto;
+    }
+
+    // Função copiar WhatsApp
+    async function copiarWpp() {
+        const texto = gerarTextoWhatsApp();
+        try {
+            await navigator.clipboard.writeText(texto);
+            alert("✅ Checklist copiado! Cole no WhatsApp com *negrito* incluso.");
+        } catch(e) {
+            alert("Erro ao copiar, tente manualmente.");
+        }
+    }
+
+    // Gerar PDF ordenado (abre nova janela com layout pronto para impressão)
+    function gerarPDFOrdenado() {
+        const itensOrdenados = obterTodosItensOrdenados();
+        const data = document.getElementById('dataInspecao').value || '__/__/____';
+        const cliente = document.getElementById('clienteVeiculo').value || 'Não informado';
+        const km = document.getElementById('kmAtual').value || '---';
+        const mecanico = document.getElementById('mecanico').value || '---';
+
+        let html = `
+        <!DOCTYPE html>
+        <html>
+        <head><meta charset="UTF-8"><title>Checklist Priorizado</title>
+        <style>
+            body { font-family: 'Segoe UI', sans-serif; margin: 20px; }
+            h2 { color: #0b5e7e; }
+            .info { background: #f0f7ff; padding: 15px; border-radius: 16px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 16px; }
+            table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+            th, td { border: 1px solid #aaa; padding: 8px; vertical-align: top; text-align: left; }
+            th { background: #2c3e50; color: white; }
+            .urgente-row { background: #ffe6e6; }
+            .atencao-row { background: #fff0db; }
+            .ok-row { background: #e6f4ea; }
+            .pendente-row { background: #f5f5f5; }
+        </style>
+        </head>
+        <body>
+        <h2>📋 CHECKLIST PRIORITÁRIO</h2>
+        <div class="info">
+            <div><strong>Data:</strong> ${data}</div><div><strong>Cliente:</strong> ${cliente}</div>
+            <div><strong>KM:</strong> ${km}</div><div><strong>Mecânico:</strong> ${mecanico}</div>
+        </div>
+        <table><thead><tr><th>#</th><th>Item</th><th>Status</th><th>Problema descrito</th></tr></thead><tbody>
+        `;
+        for(let item of itensOrdenados) {
+            let statusLabel = '', rowClass = '';
+            if(item.status === 'urgencia') { statusLabel = '🔴 URGENTE'; rowClass = 'urgente-row'; }
+            else if(item.status === 'atencao') { statusLabel = '🟡 ATENÇÃO'; rowClass = 'atencao-row'; }
+            else if(item.status === 'ok') { statusLabel = '🟢 OK'; rowClass = 'ok-row'; }
+            else { statusLabel = '⚪ PENDENTE'; rowClass = 'pendente-row'; }
+            let problema = (item.status === 'urgencia' || item.status === 'atencao') ? (item.obs || '—') : '—';
+            html += `<tr class="${rowClass}">
+                <td>${item.numero}</td>
+                <td>${item.descricao}</td>
+                <td>${statusLabel}</td>
+                <td>${problema.replace(/\n/g, '<br>')}</td>
+            </tr>`;
+        }
+        html += `</tbody></table><p style="margin-top:20px; font-size:12px;">Documento gerado por sistema checklist profissional.</p>
+        <script>window.onload = () => setTimeout(() => window.print(), 300);<\/script>
+        </body></html>`;
+        const win = window.open();
+        win.document.write(html);
+        win.document.close();
+    }
+
+    function resetAll() {
+        if(confirm("Resetar TODOS os status e observações? Não tem volta.")) {
+            for(let i=1; i<=71; i++) {
+                localStorage.removeItem(`status_${i}`);
+                localStorage.removeItem(`obs_${i}`);
+            }
+            renderizarChecklist();
+        }
+    }
+
+    // persistência dos dados do veículo
+    function bindVehicleStorage() {
+        const ids = ['dataInspecao', 'clienteVeiculo', 'kmAtual', 'mecanico'];
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            const saved = localStorage.getItem(`vehicle_${id}`);
+            if(saved) el.value = saved;
+            el.addEventListener('change', () => {
+                localStorage.setItem(`vehicle_${id}`, el.value);
+            });
+        });
+    }
+
+    window.onload = () => {
+        renderizarChecklist();
+        bindVehicleStorage();
+        document.getElementById('copiarWPP').addEventListener('click', copiarWpp);
+        document.getElementById('printPDFOrdenado').addEventListener('click', gerarPDFOrdenado);
+        document.getElementById('printPDF').addEventListener('click', () => window.print());
+        document.getElementById('resetStatus').addEventListener('click', resetAll);
+    };
+</script>
+</body>
+</html>
+
+
+
